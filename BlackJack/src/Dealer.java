@@ -1,3 +1,5 @@
+import java.util.List;
+
 
 public class Dealer extends Player {
 	private static final int minStand = 17;
@@ -6,8 +8,7 @@ public class Dealer extends Player {
 		super("Dealer");
 	}
 
-	@Override
-	public Integer decide() {
+	public int decide(List<Card> drawnCards) {
 		if(this.sumHands() < minStand)
 			return 1;
 		else
@@ -21,5 +22,4 @@ public class Dealer extends Player {
 
 	@Override
 	public void bet() {}
-
 }

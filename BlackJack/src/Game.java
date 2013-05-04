@@ -6,6 +6,7 @@ import java.util.Stack;
 public class Game {
 	private static final int initialHand = 2;
 	private static final int maxTotal = 21;
+	private static final double minBet = 10;
 	List<Player> players;
 	Dealer dealer;
 	DealerShoe dealerShoe;
@@ -45,7 +46,6 @@ public class Game {
 		while(playersAvailable())
 		{
 			placeBets();
-			handCards();
 			playOneRound();		
 			whoWins();		
 			finish();
@@ -53,13 +53,40 @@ public class Game {
 		table.print();
 	}
 	
+
 	private void playOneRound() 
 	{
+		List<Card> drawnCards = new ArrayList<Card>();
+		
+		for(int i=0; i<initialHand;i++)
+		{
+			for(Player p : players)
+			{
+				Card drawnCard = this.dealerShoe.draw();
+				p.setHands(drawnCard);
+				drawnCards.add(drawnCard);
+			}
+			Card drawnCard = this.dealerShoe.draw();
+			dealer.setHands(drawnCard);
+			drawnCards.add(drawnCard);
+		}
+		
 		for(Player p : players)
-			while(p.decide() != 0)
-				p.setHands(this.dealerShoe.draw());	
-		while(dealer.decide() != 0)
-			dealer.setHands(this.dealerShoe.draw());	
+		{
+			while(p.decide(drawnCards) != 0)
+			{
+				Card drawnCard = this.dealerShoe.draw();
+				p.setHands(drawnCard);
+				drawnCards.add(drawnCard);
+			}
+		}
+			
+		while(dealer.decide(drawnCards) != 0)
+		{
+			Card drawnCard = this.dealerShoe.draw();
+			dealer.setHands(drawnCard);
+			drawnCards.add(drawnCard);
+		}
 	}
 
 	private void whoWins() {
@@ -100,29 +127,22 @@ public class Game {
 		int i = 0;
 		for(Player p : players)
 		{
-			Stack<String[]> hands = p.getHands();
+			Stack<Card> hands = p.getHands();
 			while(!hands.isEmpty())
 				dealerShoe.usedCards.push(hands.pop());
 			if(!p.stillIn())
 				out.add(i);
 			table.append(p.name, p.getPocket());
+			p.bet = 0;
 			i++;
 		}
+		
 		for(int j : out)
 			players.remove(j);
-		Stack<String[]> hands = dealer.getHands();
+			
+		Stack<Card> hands = dealer.getHands();
 		while(!hands.isEmpty())
 			dealerShoe.usedCards.push(hands.pop());
-
-	}
-
-	private void handCards() {		
-		for(int i=0; i<initialHand;i++)
-		{
-			for(Player p : players)
-				p.setHands(this.dealerShoe.draw());
-			dealer.setHands(this.dealerShoe.draw());
-		}
 	}
 
 	private void placeBets() 
@@ -157,7 +177,8 @@ public class Game {
 						break;
 			default: 	p = new SimplePlayer(name);
 						break;
-			}			
+			}
+			p.minBet = minBet;
 			players.add(p);
 		}
 		return players;

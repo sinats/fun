@@ -1,13 +1,14 @@
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Stack;
 
 
 public abstract class Player {
 	private double pocket = 100;
-	private Stack<String[]> hands = new Stack<String[]>();
+	private Stack<Card> hands = new Stack<Card>();
 	String name;
 	double bet;
+	double minBet;
 	private double blackJack = 21;
 	private static final String ACE = "ACE";
 	
@@ -15,7 +16,7 @@ public abstract class Player {
 		this.name = name;
 	}
 	
-	public abstract Integer decide();
+	public abstract int decide(List<Card> drawnCards);
 	public abstract boolean stillIn();
 	public abstract void bet();
 	
@@ -47,8 +48,8 @@ public abstract class Player {
 
 	private ArrayList<String> getNumberFromHands() {
 		ArrayList<String> ret = new ArrayList<String>();
-		for(String[] s : hands)
-			ret.add(s[1]);
+		for(Card s : hands)
+			ret.add(s.number);
 		return ret;
 	}
 
@@ -61,7 +62,7 @@ public abstract class Player {
 		System.out.println( this.name + "'s pocket is now " + this.pocket);
 	}
 
-	public Stack<String[]> getHands() {
+	public Stack<Card> getHands() {
 		return hands;
 	}
 	
@@ -70,8 +71,9 @@ public abstract class Player {
 		this.hands.clear();
 	}
 
-	public void setHands(String[] cards) {
-		System.out.println( this.name + " draws " + Arrays.toString(cards));
-		this.hands.addElement(cards);
+	public void setHands(Card drawnCard) {
+		System.out.println( this.name + " draws " + drawnCard.print());
+		this.hands.addElement(drawnCard);
 	}
+
 }

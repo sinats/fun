@@ -5,7 +5,7 @@ import java.util.Stack;
 public class Deck 
 {
 	// {HEARTS, TWO}, {SPADES, TEN}
-	Stack<String[]> deck = new Stack<String[]>();
+	Stack<Card> deck = new Stack<Card>();
 	HashMap <String, Integer> valuesMap = new HashMap<String, Integer>(13);
 	
 	public Deck()
@@ -28,13 +28,12 @@ public class Deck
 		{
 			for(String j : valuesMap.keySet())
 			{
-				String[] x = {suits[i], j};
-				deck.push(x);
+				deck.push(new Card(suits[i],j));
 			}
 		}
 	}
 	
-	public Stack<String[]> get()
+	public Stack<Card> get()
 	{
 		return deck;		
 	}

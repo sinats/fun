@@ -1,5 +1,4 @@
-
-
+import java.util.List;
 
 public class SimplePlayer extends Player {
 
@@ -7,7 +6,7 @@ public class SimplePlayer extends Player {
 		super(name);
 	}
 
-	public Integer decide() {
+	public int decide(List<Card> drawnCards) {
 		int myHand = this.sumHands();
 		System.out.println(this.name + " has " + myHand);
 		if(myHand < 17)
@@ -17,16 +16,17 @@ public class SimplePlayer extends Player {
 	}
 
 	public boolean stillIn() {
-		if(this.getPocket() >= 200 || this.getPocket() < 5)
+		if(this.getPocket() >= 200 || this.getPocket() < this.minBet)
 			return false;
 		else 
 			return true;
 	}
 
 	public void bet() {
-		this.bet = 10;
-		System.out.println( this.name+ " bets 10!");
-		this.setPocket(this.getPocket()-10);
+		this.bet = (int)this.getPocket()/10;
+		if(this.bet < this.minBet) this.bet = this.minBet;
+		System.out.println( this.name+ " bets " + this.bet + "!");
+		this.setPocket(this.getPocket()-this.bet);
 	}
 	
 	

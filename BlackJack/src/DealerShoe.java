@@ -3,8 +3,8 @@ import java.util.Stack;
 
 
 public class DealerShoe {
-	Stack<String[]> cards = new Stack<String[]>();
-	Stack<String[]> usedCards = new Stack<String[]>();
+	Stack<Card> cards = new Stack<Card>();
+	Stack<Card> usedCards = new Stack<Card>();
 	private int minShuffle = 200;
 	
 	public DealerShoe(int numOfDecks)
@@ -20,7 +20,7 @@ public class DealerShoe {
 			shuffle();
 	}
 	
-	public String[] draw()
+	public Card draw()
 	{
 		if(!cards.isEmpty())
 			return cards.pop();
@@ -36,29 +36,15 @@ public class DealerShoe {
 	
 	public void shuffle()
 	{
-		Stack<String[]> stack1 = new Stack<String[]>();
-		Stack<String[]> stack2 = new Stack<String[]>();
-		int size = cards.size();
-		int i = 0;
-		while(i<size/2)
+		Stack<Card> temp = new Stack<Card>();
+		temp.addAll(cards);
+		Random rand = new Random(System.currentTimeMillis());
+		this.cards.clear();
+		while(!temp.isEmpty())
 		{
-			stack1.push(cards.pop());
-			i++;
-		}
-		while(!cards.isEmpty())
-			stack2.push(cards.pop());
-		while(!stack1.isEmpty() || !stack2.isEmpty())
-		{
-			Random rand = new Random();
-			int split = rand.nextInt(1);
-			for(i=0;i<=split;i++)
-			{
-				if(!stack1.isEmpty())
-					cards.push(stack1.pop());
-			}
-				
-			if(!stack2.isEmpty())
-				cards.push(stack2.pop());
+			int pos = rand.nextInt(temp.size());
+			this.cards.add(temp.get(pos));
+			temp.remove(pos);
 		}	
 	}
 }
