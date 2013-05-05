@@ -2,11 +2,13 @@
 public class Card {
 	public String suit;
 	public String number;
+	public int num;
 	
-	public Card(String suit, String number)
+	public Card(String suit, String number, int num)
 	{
 		this.suit = suit;
 		this.number = number;
+		this.num = num;
 	}
 
 	public String print() {
