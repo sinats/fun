@@ -4,7 +4,7 @@ import java.util.Stack;
 
 
 public abstract class Player {
-	private double pocket = 100;
+	private double pocket = 1000;
 	private Stack<Card> hands = new Stack<Card>();
 	String name;
 	double bet;
@@ -19,16 +19,7 @@ public abstract class Player {
 	public abstract int decide(List<Card> drawnCards);
 	public abstract boolean stillIn();
 	public abstract void bet();
-	
-	public boolean isBankrupt()
-	{
-		if(getPocket() < .01){ 
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
+		
 	protected int sumHands()
 	{
 		ArrayList<String> numbers = getNumberFromHands();
@@ -75,5 +66,11 @@ public abstract class Player {
 		System.out.println( this.name + " draws " + drawnCard.print());
 		this.hands.addElement(drawnCard);
 	}
-
+	public void putBet()
+	{
+		if(this.bet < this.minBet) this.bet = this.minBet;
+		if(this.bet > this.pocket) this.bet = this.pocket;
+		System.out.println( this.name+ " bets " + this.bet + "!");
+		this.setPocket(this.getPocket()-this.bet);
+	}
 }

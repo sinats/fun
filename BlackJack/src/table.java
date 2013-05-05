@@ -1,6 +1,5 @@
 import java.io.IOException;
 
-
 public class table {
 	static int numOfPlayers = 0;
 	static int numOfDecks = 0;

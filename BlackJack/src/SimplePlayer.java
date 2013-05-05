@@ -3,7 +3,7 @@ import java.util.List;
 public class SimplePlayer extends Player {
 
 	public SimplePlayer(String name) {
-		super(name);
+		super(name + "_sim");
 	}
 
 	public int decide(List<Card> drawnCards) {
@@ -16,7 +16,7 @@ public class SimplePlayer extends Player {
 	}
 
 	public boolean stillIn() {
-		if(this.getPocket() >= 200 || this.getPocket() < this.minBet)
+		if(this.getPocket() >= 2000 || this.getPocket() < this.minBet)
 			return false;
 		else 
 			return true;
@@ -24,10 +24,6 @@ public class SimplePlayer extends Player {
 
 	public void bet() {
 		this.bet = (int)this.getPocket()/10;
-		if(this.bet < this.minBet) this.bet = this.minBet;
-		System.out.println( this.name+ " bets " + this.bet + "!");
-		this.setPocket(this.getPocket()-this.bet);
+		putBet();
 	}
-	
-	
 }

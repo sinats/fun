@@ -1,5 +1,7 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -137,9 +139,12 @@ public class Game {
 			i++;
 		}
 		
+		Collections.sort(out);
+		Collections.reverse(out);
+		
 		for(int j : out)
 			players.remove(j);
-			
+		
 		Stack<Card> hands = dealer.getHands();
 		while(!hands.isEmpty())
 			dealerShoe.usedCards.push(hands.pop());
@@ -166,7 +171,7 @@ public class Game {
 		// initiate i+1 number of players to include the dealer
 		for(int i=0; i<numOfPlayers; i++)
 		{
-			int type = 1;
+			int type = i;
 			Player p;
 			String name;
 			IOHandler ioh = new IOHandler();
@@ -174,6 +179,8 @@ public class Game {
 			
 			switch (type) {
 			case 1: 	p = new SimplePlayer(name);
+						break;
+			case 2: 	p = new CountingPlayer(name);
 						break;
 			default: 	p = new SimplePlayer(name);
 						break;

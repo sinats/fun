@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Stack;
 
 
@@ -26,9 +27,9 @@ public class Deck
 		valuesMap.put("ACE", 11);
 		for(int i=0; i<suits.length; i++)
 		{
-			for(String j : valuesMap.keySet())
+			for(Entry<String, Integer> j : valuesMap.entrySet())
 			{
-				deck.push(new Card(suits[i],j));
+				deck.push(new Card(suits[i],j.getKey(),j.getValue()));
 			}
 		}
 	}
