@@ -1,3 +1,6 @@
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,8 +25,9 @@ public class StandingTable {
 		table.put(name, array);
 	}
 	
-	public void print()
+	public void print(String folder, String fileName) throws FileNotFoundException, UnsupportedEncodingException
 	{
+		PrintWriter pw = new OutputHandler(folder, fileName).get();
 		int max = 0;
 		Set<String> names = table.keySet();
 		
@@ -32,9 +36,9 @@ public class StandingTable {
 			if(h == null)
 				break;
 			else
-				System.out.format("%1$10s", h);
+				pw.format("%1$10s", h);
 		}
-		System.out.println("");	
+		pw.println("");	
 		
 		for(ArrayList<Double> v : table.values())
 			if(v.size() > max) max = v.size();
@@ -44,11 +48,12 @@ public class StandingTable {
 			for(String name : names)
 			{
 				if(table.get(name).size()>i)
-					System.out.format("%1$10s", Double.toString(table.get(name).get(i)));
+					pw.format("%1$10s", Double.toString(table.get(name).get(i)));
 				else
-					System.out.format("%1$10s", "");
+					pw.format("%1$10s", "");
 			}
-			System.out.println("");	
+			pw.println("");	
 		}
+		pw.close();
 	}
 }

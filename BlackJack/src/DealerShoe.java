@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Stack;
 
@@ -22,16 +23,7 @@ public class DealerShoe {
 	
 	public Card draw()
 	{
-		if(!cards.isEmpty())
-			return cards.pop();
-		else
-		{
-			cards.addAll(usedCards);
-			usedCards.clear();
-			for(int i=0; i<100; i++)
-				shuffle();
-			return cards.pop();
-		}
+		return cards.pop();
 	}
 	
 	public void shuffle()
@@ -45,6 +37,26 @@ public class DealerShoe {
 			int pos = rand.nextInt(temp.size());
 			this.cards.add(temp.get(pos));
 			temp.remove(pos);
-		}	
+		}
+		validate();
+	}
+
+	private void validate() {
+		HashMap<String, Integer> validate = new HashMap<String, Integer>();
+		Stack<Card> temp = new Stack<Card>();
+		temp.addAll(cards);
+		while(!temp.isEmpty())
+		{
+			Card pop = temp.pop();
+			if(validate.containsKey(pop.number))
+			{
+				int i = validate.get(pop.number);
+				validate.put(pop.number, ++i);
+			}
+			else
+			{
+				validate.put(pop.number, 1);
+			}
+		}
 	}
 }

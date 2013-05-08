@@ -1,6 +1,8 @@
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
@@ -15,6 +17,9 @@ public class Game {
 	int numOfDecks;
 	int numOfPlayers;
 	StandingTable table;
+	String folder = "C:/Users/F000FXK/Documents/Classes";
+	String  fileName = "Game.txt";
+	PrintWriter pw;
 
 	public Game(int numOfPlayers, int numOfDecks) throws IOException 
 	{
@@ -26,6 +31,7 @@ public class Game {
 		
 		//must be instantiated after the players on the table are set
 		this.table =  new StandingTable(getPlayerNames());
+		this.pw = new OutputHandler(folder, fileName).get();
 	}
 
 	private List<String> getPlayerNames() {
@@ -37,7 +43,7 @@ public class Game {
 		return ret;
 	}
 
-	public void play() 
+	public void play() throws FileNotFoundException, UnsupportedEncodingException 
 	{
 		/* 
 		 * The algorithm here is:
@@ -47,14 +53,26 @@ public class Game {
 		 */		
 		while(playersAvailable())
 		{
+			checkDealerShoe();
 			placeBets();
 			playOneRound();		
 			whoWins();		
 			finish();
 		}
-		table.print();
+		table.print(folder, "BlackJack.txt");
+		pw.close();
 	}
 	
+
+	private void checkDealerShoe() {
+		if(this.dealerShoe.cards.size() < 5*(this.numOfPlayers+1))
+		{
+			dealerShoe.cards.addAll(dealerShoe.usedCards);
+			dealerShoe.usedCards.clear();
+			for(int i=0; i<100; i++)
+				dealerShoe.shuffle();
+		}
+	}
 
 	private void playOneRound() 
 	{
@@ -75,7 +93,7 @@ public class Game {
 		
 		for(Player p : players)
 		{
-			while(p.decide(drawnCards) != 0)
+			while(p.decide() != 0)
 			{
 				Card drawnCard = this.dealerShoe.draw();
 				p.setHands(drawnCard);
@@ -83,11 +101,16 @@ public class Game {
 			}
 		}
 			
-		while(dealer.decide(drawnCards) != 0)
+		while(dealer.decide() != 0)
 		{
 			Card drawnCard = this.dealerShoe.draw();
 			dealer.setHands(drawnCard);
 			drawnCards.add(drawnCard);
+		}
+		
+		for(Player p : players)
+		{
+			p.watch(drawnCards);
 		}
 	}
 
@@ -99,29 +122,50 @@ public class Game {
 			int playerHand = p.sumHands();
 			if(playerHand > maxTotal)
 			{
-				System.out.println(p.name + " has " + playerHand + " and loses.");
+				pw.println(p.name + " has " + playerHand + " and loses.");
+			}
+			else if(isBlackJack(p) && isBlackJack(dealer))
+			{
+				pw.println(p.name + " and Dealer pushes. Both have BlackJack.");
+				p.setPocket(p.getPocket() + (1 * p.bet));
+			}
+			else if(isBlackJack(p))
+			{
+				pw.println(p.name + " has BlackJack and wins.");
+				p.setPocket(p.getPocket() + (2.5 * p.bet));
 			}
 			else if(dealerHand > maxTotal)
 			{
-				System.out.println("Dealer is over 21. " + p.name + " has " + playerHand + " and wins.");
+				pw.println("Dealer is over 21. " + p.name + " has " + playerHand + " and wins.");
 				p.setPocket(p.getPocket() + (2 * p.bet));
 			}
 			else if(playerHand > dealerHand)
 			{
-				System.out.println(p.name + " has " + playerHand + " and Dealer has "
+				pw.println(p.name + " has " + playerHand + " and Dealer has "
 						+ dealerHand + ". " + p.name + " wins." );
 				p.setPocket(p.getPocket() + (2 * p.bet));
 			}
 			else if(playerHand == dealerHand)
 			{
-				System.out.println(p.name + " and Dealer pushes. Both have " + playerHand + ".");
+				pw.println(p.name + " and Dealer pushes. Both have " + playerHand + ".");
 				p.setPocket(p.getPocket() + (1 * p.bet));
 			}
 			else
 			{
-				System.out.println(p.name + " loses. Dealer has " + dealerHand + ".");
+				pw.println(p.name + " loses. Dealer has " + dealerHand + ".");
 			}
 		}	
+	}
+
+	private boolean isBlackJack(Player p) {
+		ArrayList<String> numbers = new ArrayList<String>();
+		for(Card temp : p.getHands()) numbers.add(temp.number);
+		if(p.getHands().size() > 2)
+			return false;
+		else if(numbers.contains("ACE") && !numbers.contains("TEN") && p.sumHands() == 21)
+			return true;
+		else 
+			return false;
 	}
 
 	private void finish() {
@@ -159,7 +203,7 @@ public class Game {
 	private boolean playersAvailable() 
 	{
 		int playersIn = players.size();
-		System.out.println("We start the round with " + playersIn + " people.");
+		pw.println("We start the round with " + playersIn + " people.");
 		return playersIn > 0;
 	}
 
@@ -171,13 +215,12 @@ public class Game {
 		// initiate i+1 number of players to include the dealer
 		for(int i=0; i<numOfPlayers; i++)
 		{
-			int type = i;
 			Player p;
 			String name;
 			IOHandler ioh = new IOHandler();
 			name = ioh.queryInput("What's the name of player " + (i+1) + "?");
 			
-			switch (type) {
+			switch (i) {
 			case 1: 	p = new SimplePlayer(name);
 						break;
 			case 2: 	p = new CountingPlayer(name);

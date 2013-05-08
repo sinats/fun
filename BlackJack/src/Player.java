@@ -1,25 +1,33 @@
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
 
 public abstract class Player {
-	private double pocket = 1000;
+	private double pocket = 10000;
 	private Stack<Card> hands = new Stack<Card>();
 	String name;
 	double bet;
 	double minBet;
 	private double blackJack = 21;
 	private static final String ACE = "ACE";
+	String folder = "C:/Users/F000FXK/Documents/Classes";
+	String fileName = "Player.txt";
+	PrintWriter pw;
 	
-	public Player(String name) {
+	public Player(String name) throws FileNotFoundException, UnsupportedEncodingException {
 		this.name = name;
+		this.pw = new OutputHandler(folder, fileName).get();
 	}
 	
-	public abstract int decide(List<Card> drawnCards);
+	public abstract int decide();
 	public abstract boolean stillIn();
 	public abstract void bet();
 		
+	public void watch(List<Card> drawnCards) {}
 	protected int sumHands()
 	{
 		ArrayList<String> numbers = getNumberFromHands();
