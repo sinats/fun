@@ -6,12 +6,11 @@ public class SimplePlayer extends Player {
 
 	public SimplePlayer(String name) throws FileNotFoundException, UnsupportedEncodingException {
 		super(name + "_sim");
-		super.setPocket(100000);
+		super.setPocket(100);
 	}
 
 	public int decide() {
 		int myHand = this.sumHands();
-		System.out.println(this.name + " has " + myHand);
 		if(myHand < 17)
 			return 1;
 		else

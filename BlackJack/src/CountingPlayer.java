@@ -30,7 +30,6 @@ public class CountingPlayer extends Player{
 
 	@Override
 	public void bet() {
-		pw.println(this.sum);
 		if(this.sum > 10) 
 			this.bet = (int)this.getPocket()/5; 
 		else if (this.sum>5) 

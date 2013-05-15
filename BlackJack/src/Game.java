@@ -1,6 +1,5 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,11 +16,9 @@ public class Game {
 	int numOfDecks;
 	int numOfPlayers;
 	StandingTable table;
-	String folder = "C:/Users/F000FXK/Documents/Classes";
-	String  fileName = "Game.txt";
-	PrintWriter pw;
+	OutputHandler oh;
 
-	public Game(int numOfPlayers, int numOfDecks) throws IOException 
+	public Game(int numOfPlayers, int numOfDecks, boolean print) throws IOException 
 	{
 		this.numOfPlayers = numOfPlayers;
 		this.numOfDecks = numOfDecks;
@@ -31,7 +28,7 @@ public class Game {
 		
 		//must be instantiated after the players on the table are set
 		this.table =  new StandingTable(getPlayerNames());
-		this.pw = new OutputHandler(folder, fileName).get();
+		this.oh = new OutputHandler(print);
 	}
 
 	private List<String> getPlayerNames() {
@@ -59,13 +56,12 @@ public class Game {
 			whoWins();		
 			finish();
 		}
-		table.print(folder, "BlackJack.txt");
-		pw.close();
+		System.out.println(table.getResult());
 	}
 	
 
 	private void checkDealerShoe() {
-		if(this.dealerShoe.cards.size() < 5*(this.numOfPlayers+1))
+		if(this.dealerShoe.cards.size() < this.numOfDecks*52/5)
 		{
 			dealerShoe.cards.addAll(dealerShoe.usedCards);
 			dealerShoe.usedCards.clear();
@@ -81,37 +77,26 @@ public class Game {
 		for(int i=0; i<initialHand;i++)
 		{
 			for(Player p : players)
-			{
-				Card drawnCard = this.dealerShoe.draw();
-				p.setHands(drawnCard);
-				drawnCards.add(drawnCard);
-			}
-			Card drawnCard = this.dealerShoe.draw();
-			dealer.setHands(drawnCard);
-			drawnCards.add(drawnCard);
+				handCard(p, this.dealerShoe.draw(), drawnCards);
+			handCard(dealer, this.dealerShoe.draw(), drawnCards);
 		}
 		
 		for(Player p : players)
-		{
 			while(p.decide() != 0)
-			{
-				Card drawnCard = this.dealerShoe.draw();
-				p.setHands(drawnCard);
-				drawnCards.add(drawnCard);
-			}
-		}
+				handCard(p, this.dealerShoe.draw(), drawnCards);
 			
 		while(dealer.decide() != 0)
-		{
-			Card drawnCard = this.dealerShoe.draw();
-			dealer.setHands(drawnCard);
-			drawnCards.add(drawnCard);
-		}
+			handCard(dealer, this.dealerShoe.draw(), drawnCards);
 		
 		for(Player p : players)
-		{
 			p.watch(drawnCards);
-		}
+	}
+
+	private void handCard(Player p, Card drawnCard, List<Card> drawnCards) {
+		p.setHands(drawnCard);
+		oh.print(p.name + " draws " + drawnCard.print());
+		oh.print(p.name + " has " + p.sumHands());
+		drawnCards.add(drawnCard);
 	}
 
 	private void whoWins() {
@@ -121,40 +106,26 @@ public class Game {
 		{
 			int playerHand = p.sumHands();
 			if(playerHand > maxTotal)
-			{
-				pw.println(p.name + " has " + playerHand + " and loses.");
-			}
+				oh.print(p.name + " has " + playerHand + " and loses.");
 			else if(isBlackJack(p) && isBlackJack(dealer))
-			{
-				pw.println(p.name + " and Dealer pushes. Both have BlackJack.");
-				p.setPocket(p.getPocket() + (1 * p.bet));
-			}
+				setWinnings(p, 1, p.name + " and Dealer pushes. Both have BlackJack.");
 			else if(isBlackJack(p))
-			{
-				pw.println(p.name + " has BlackJack and wins.");
-				p.setPocket(p.getPocket() + (2.5 * p.bet));
-			}
+				setWinnings(p, 2.5, p.name + " has BlackJack and wins.");
 			else if(dealerHand > maxTotal)
-			{
-				pw.println("Dealer is over 21. " + p.name + " has " + playerHand + " and wins.");
-				p.setPocket(p.getPocket() + (2 * p.bet));
-			}
+				setWinnings(p, 2, "Dealer is over 21. " + p.name + " has " + playerHand + " and wins.");
 			else if(playerHand > dealerHand)
-			{
-				pw.println(p.name + " has " + playerHand + " and Dealer has "
-						+ dealerHand + ". " + p.name + " wins." );
-				p.setPocket(p.getPocket() + (2 * p.bet));
-			}
+				setWinnings(p, 2, p.name + " has " + playerHand + " and Dealer has " + dealerHand + ". " + p.name + " wins." );
 			else if(playerHand == dealerHand)
-			{
-				pw.println(p.name + " and Dealer pushes. Both have " + playerHand + ".");
-				p.setPocket(p.getPocket() + (1 * p.bet));
-			}
+				setWinnings(p, 1, p.name + " and Dealer pushes. Both have " + playerHand + ".");
 			else
-			{
-				pw.println(p.name + " loses. Dealer has " + dealerHand + ".");
-			}
+				oh.print(p.name + " loses. Dealer has " + dealerHand + ".");
 		}	
+	}
+
+	private void setWinnings(Player p, double win, String string) {
+		p.setPocket(p.getPocket() + (win * p.bet));
+		oh.print(string);
+		oh.print(p.name + "'s pocket is now " + p.getPocket());
 	}
 
 	private boolean isBlackJack(Player p) {
@@ -197,13 +168,16 @@ public class Game {
 	private void placeBets() 
 	{
 		for(Player p : players)
+		{
 			p.bet();
+			oh.print(p.name+ " bets " + p.bet + "!");
+		}
 	}
 
 	private boolean playersAvailable() 
 	{
 		int playersIn = players.size();
-		pw.println("We start the round with " + playersIn + " people.");
+		oh.print("We start the round with " + playersIn + " people.");
 		return playersIn > 0;
 	}
 

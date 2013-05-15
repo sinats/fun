@@ -1,5 +1,4 @@
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,18 +8,15 @@ import java.util.Stack;
 public abstract class Player {
 	private double pocket = 10000;
 	private Stack<Card> hands = new Stack<Card>();
+	private int sum = 0;
 	String name;
 	double bet;
 	double minBet;
 	private double blackJack = 21;
 	private static final String ACE = "ACE";
-	String folder = "C:/Users/F000FXK/Documents/Classes";
-	String fileName = "Player.txt";
-	PrintWriter pw;
 	
 	public Player(String name) throws FileNotFoundException, UnsupportedEncodingException {
 		this.name = name;
-		this.pw = new OutputHandler(folder, fileName).get();
 	}
 	
 	public abstract int decide();
@@ -28,10 +24,10 @@ public abstract class Player {
 	public abstract void bet();
 		
 	public void watch(List<Card> drawnCards) {}
+	
 	protected int sumHands()
 	{
-		ArrayList<String> numbers = getNumberFromHands();
-		return addMyNumbers(numbers);		
+		return this.sum;
 	}
 
 	private int addMyNumbers(ArrayList<String> numbers) {
@@ -58,7 +54,6 @@ public abstract class Player {
 
 	public void setPocket(double pocket) {
 		this.pocket = pocket;
-		System.out.println( this.name + "'s pocket is now " + this.pocket);
 	}
 
 	public Stack<Card> getHands() {
@@ -71,14 +66,14 @@ public abstract class Player {
 	}
 
 	public void setHands(Card drawnCard) {
-		System.out.println( this.name + " draws " + drawnCard.print());
 		this.hands.addElement(drawnCard);
+		this.sum = addMyNumbers(getNumberFromHands());	
 	}
+	
 	public void putBet()
 	{
 		if(this.bet < this.minBet) this.bet = this.minBet;
 		if(this.bet > this.pocket) this.bet = this.pocket;
-		System.out.println( this.name+ " bets " + this.bet + "!");
 		this.setPocket(this.getPocket()-this.bet);
 	}
 }
