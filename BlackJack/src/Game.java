@@ -18,7 +18,7 @@ public class Game {
 	StandingTable table;
 	IOHandler ioh;
 
-	public Game(int numOfPlayers, int numOfDecks, boolean print) throws IOException 
+	public Game(int numOfPlayers, int numOfDecks) throws IOException 
 	{
 		this.ioh = IOHandler.getInstance();
 		this.numOfPlayers = numOfPlayers;
