@@ -16,10 +16,11 @@ public class Game {
 	int numOfDecks;
 	int numOfPlayers;
 	StandingTable table;
-	OutputHandler oh;
+	IOHandler ioh;
 
 	public Game(int numOfPlayers, int numOfDecks, boolean print) throws IOException 
 	{
+		this.ioh = IOHandler.getInstance();
 		this.numOfPlayers = numOfPlayers;
 		this.numOfDecks = numOfDecks;
 		this.dealer = new Dealer();
@@ -28,15 +29,12 @@ public class Game {
 		
 		//must be instantiated after the players on the table are set
 		this.table =  new StandingTable(getPlayerNames());
-		this.oh = new OutputHandler(print);
 	}
 
 	private List<String> getPlayerNames() {
 		List<String> ret = new ArrayList<String>();
 		for(Player p : players)
-		{
 			ret.add(p.name);
-		}
 		return ret;
 	}
 
@@ -94,8 +92,8 @@ public class Game {
 
 	private void handCard(Player p, Card drawnCard, List<Card> drawnCards) {
 		p.setHands(drawnCard);
-		oh.print(p.name + " draws " + drawnCard.print());
-		oh.print(p.name + " has " + p.sumHands());
+		ioh.print(p.name + " draws " + drawnCard.print());
+		ioh.print(p.name + " has " + p.sumHands());
 		drawnCards.add(drawnCard);
 	}
 
@@ -106,7 +104,7 @@ public class Game {
 		{
 			int playerHand = p.sumHands();
 			if(playerHand > maxTotal)
-				oh.print(p.name + " has " + playerHand + " and loses.");
+				ioh.print(p.name + " has " + playerHand + " and loses.");
 			else if(isBlackJack(p) && isBlackJack(dealer))
 				setWinnings(p, 1, p.name + " and Dealer pushes. Both have BlackJack.");
 			else if(isBlackJack(p))
@@ -118,14 +116,14 @@ public class Game {
 			else if(playerHand == dealerHand)
 				setWinnings(p, 1, p.name + " and Dealer pushes. Both have " + playerHand + ".");
 			else
-				oh.print(p.name + " loses. Dealer has " + dealerHand + ".");
+				ioh.print(p.name + " loses. Dealer has " + dealerHand + ".");
 		}	
 	}
 
 	private void setWinnings(Player p, double win, String string) {
 		p.setPocket(p.getPocket() + (win * p.bet));
-		oh.print(string);
-		oh.print(p.name + "'s pocket is now " + p.getPocket());
+		ioh.print(string);
+		ioh.print(p.name + "'s pocket is now " + p.getPocket());
 	}
 
 	private boolean isBlackJack(Player p) {
@@ -170,14 +168,14 @@ public class Game {
 		for(Player p : players)
 		{
 			p.bet();
-			oh.print(p.name+ " bets " + p.bet + "!");
+			ioh.print(p.name+ " bets " + p.bet + "!");
 		}
 	}
 
 	private boolean playersAvailable() 
 	{
 		int playersIn = players.size();
-		oh.print("We start the round with " + playersIn + " people.");
+		ioh.print("We start the round with " + playersIn + " people.");
 		return playersIn > 0;
 	}
 
@@ -191,7 +189,6 @@ public class Game {
 		{
 			Player p;
 			String name;
-			IOHandler ioh = new IOHandler();
 			name = ioh.queryInput("What's the name of player " + (i+1) + "?");
 			
 			switch (i) {

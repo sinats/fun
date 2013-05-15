@@ -4,6 +4,31 @@ import java.io.InputStreamReader;
 
 
 public class IOHandler {
+	private static IOHandler instance;
+	boolean print;
+	
+	private IOHandler(boolean print) {
+		this.print = print;
+	}
+	
+	public static synchronized IOHandler getInstance(boolean print) {
+		if(instance == null)
+			instance = new IOHandler(print);
+		return instance;
+	}
+	
+	public static synchronized IOHandler getInstance() {
+		if(instance == null)
+			instance = new IOHandler(false);
+		return instance;
+	}
+	
+	public void print(String text)
+	{
+		if(this.print)
+			System.out.println(text);
+	}
+	
 	public String queryInput(String string) throws IOException{
 		String input = null;
 		System.out.println(string);
