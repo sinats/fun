@@ -7,18 +7,10 @@ public class table {
 	
 	public static void main(String[] args) throws IOException{
 		ioh = IOHandler.getInstance();
-		numOfPlayers = getNumOfPlayers();
-		numOfDecks = getNumOfDecks();
+		numOfPlayers = (int) Double.parseDouble(ioh.queryInput("How many players to start?"));
+		numOfDecks = (int) Double.parseDouble(ioh.queryInput("How many decks to start?"));
 		Game game = new Game(numOfPlayers, numOfDecks);
 		game.play();
-		System.out.println("The game has finished!");
-	}
-	
-	private static int getNumOfDecks() throws NumberFormatException, IOException {
-		return (int) Double.parseDouble(ioh.queryInput("How many decks to start?"));
-	}
-
-	private static int getNumOfPlayers() throws IOException {
-		return (int) Double.parseDouble(ioh.queryInput("How many players to start?"));
+		ioh.print("The game has finished!");
 	}
 }
