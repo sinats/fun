@@ -7,24 +7,17 @@ public class IOHandler {
 	private static IOHandler instance;
 	boolean print;
 	
-	private IOHandler(boolean print) {
-		this.print = print;
+	private IOHandler() throws IOException {
+		this.print = "Yes".equalsIgnoreCase(queryInput("Print output?"));
 	}
-	
-	public static synchronized IOHandler getInstance(boolean print) {
+
+	public static synchronized IOHandler getInstance() throws IOException {
 		if(instance == null)
-			instance = new IOHandler(print);
+			instance = new IOHandler();
 		return instance;
 	}
 	
-	public static synchronized IOHandler getInstance() {
-		if(instance == null)
-			instance = new IOHandler(false);
-		return instance;
-	}
-	
-	public void print(String text)
-	{
+	public void print(String text) {
 		if(this.print)
 			System.out.println(text);
 	}
